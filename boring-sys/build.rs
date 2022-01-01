@@ -184,6 +184,18 @@ fn get_boringssl_cmake_config() -> cmake::Config {
             boringssl_cmake
         }
 
+        "windows" => {
+            // BoringSSL's tools need to use GetTickCount64() and inet_ntop() functions
+            // which first appeared in Windows Vista.
+            // When building for "x86_64-pc-windows-gnu" via MinGW, cmake fails to detect this.
+            // Point the Windows headers in the right direction.
+            // https://docs.microsoft.com/en-us/windows/win32/winprog/using-the-windows-headers
+            boringssl_cmake.cflag("-D_WIN32_WINNT=0x0600");
+            boringssl_cmake.cxxflag("-D_WIN32_WINNT=0x0600");
+
+            boringssl_cmake
+        }
+
         _ => {
             // Configure BoringSSL for building on 32-bit non-windows platforms.
             if arch == "x86" && os != "windows" {
