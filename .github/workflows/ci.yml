@@ -113,6 +113,8 @@ jobs:
           os: ubuntu-latest
           test-type: run
 
+        # It's... theoretically possible to run tests on iPhone Simulator,
+        # but for now, make sure that BoringSSL only builds.
         - thing: aarch64-ios
           target: aarch64-apple-ios
           os: macos-latest
@@ -152,6 +154,8 @@ jobs:
           rust: stable
           os: ubuntu-latest
           test-type: run
+        # CI's Windows doesn't have required root certs,
+        # breaking tokio-boring and hyper-boring tests.
         - thing: i686-msvc
           target: i686-pc-windows-msvc
           rust: stable-x86_64-msvc
@@ -185,14 +189,11 @@ jobs:
       if: startsWith(matrix.os, 'windows')
       run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
     - if: matrix.test-type == 'run-without-hyper'
-      # CI's Windows doesn't have require root certs
       run: cargo test --target ${{ matrix.target }} --workspace --exclude tokio-boring --exclude hyper-boring
       name: Run tests (Windows)
     - if: matrix.test-type == 'run'
       run: cargo test --target ${{ matrix.target }}
       name: Run tests (not Windows)
     - if: matrix.test-type == 'build-only'
-      # It's... theoretically possible to run tests on iPhone Simulator,
-      # but for now, make sure that BoringSSL only builds.
       run: cargo test --target ${{ matrix.target }} --no-run
       name: Build tests (iOS)
