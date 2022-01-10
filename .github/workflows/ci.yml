@@ -58,7 +58,7 @@ jobs:
         mkdir -p ~/.cargo
         cat > ~/.cargo/config.toml <<EOF
         [target.${{ matrix.target }}]
-        linker = "${ANDROID_NDK_ROOT}/toolchains/aarch64-linux-android-4.9/prebuild/linux-x86_64/bin/aarch64-linux-android-ld"
+        linker = "${ANDROID_NDK_ROOT}/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-ld"
         EOF
     - if: matrix.test-type == 'run-without-hyper'
       run: cargo test --target ${{ matrix.target }} --workspace --exclude tokio-boring --exclude hyper-boring
