@@ -98,7 +98,7 @@ fn get_boringssl_cmake_config() -> cmake::Config {
     // TODO: arguably, this should be a part of "cmake-rs"
     // Specify target CPU architecture so that generic cross-compilation works.
     // Individual platforms might have their own specifics.
-    boringssl_cmake.define("CMAKE_SYSTEM_PROCESSOR", arch);
+    boringssl_cmake.define("CMAKE_SYSTEM_PROCESSOR", &arch);
 
     // Add platform-specific parameters.
     match os.as_ref() {
