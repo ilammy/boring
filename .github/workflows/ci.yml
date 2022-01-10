@@ -14,145 +14,20 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  rustfmt:
-    name: rustfmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Rust
-        run: rustup update stable && rustup default stable
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-
-  clippy:
-    name: clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Install Rust
-        run: rustup update stable && rustup default stable
-      - name: Get rust version
-        id: rust-version
-        run: echo "::set-output name=version::$(rustc --version)"
-      - name: Cache cargo index
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/registry/index
-          key: index-${{ runner.os }}-${{ github.run_number }}
-          restore-keys: |
-            index-${{ runner.os }}-
-      - name: Create lockfile
-        run: cargo generate-lockfile
-      - name: Cache cargo registry
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/registry/cache
-          key: registry-${{ runner.os }}-${{ steps.rust-version.outputs.version }}-${{ hashFiles('Cargo.lock') }}
-      - name: Fetch dependencies
-        run: cargo fetch
-      - name: Cache target directory
-        uses: actions/cache@v1
-        with:
-          path: target
-          key: clippy-target-${{ runner.os }}-${{ steps.rust-version.outputs.version }}-${{ hashFiles('Cargo.lock') }}
-      - name: Run clippy
-        run: cargo clippy --all --all-targets
   test:
     name: Test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         thing:
-        - stable
-        - macos-x86_64
-        - arm-android
-        - arm64-android
-        - i686-android
-        - x86_64-android
-        - i686-linux
-        - arm-linux
         - aarch64-linux
-        - x86_64-musl
-        - x86_64-mingw
-        - i686-msvc
-        - x86_64-msvc
         include:
-        - thing: stable
-          target: x86_64-unknown-linux-gnu
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-        - thing: macos-x86_64
-          target: x86_64-apple-darwin
-          rust: stable
-          os: macos-latest
-          test-type: run
-
-        # FIXME: these targets fail to compile due to linker mismatch
-        - thing: arm-android
-          target: arm-linux-androideabi
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-        - thing: arm64-android
-          target: aarch64-linux-android
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-        - thing: i686-android
-          target: i686-linux-android
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-        - thing: x86_64-android
-          target: x86_64-linux-android
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-
         # FIXME: these targets fail to compile due missing cross-compilers
-        - thing: i686-linux
-          target: i686-unknown-linux-gnu
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-        - thing: arm-linux
-          target: arm-unknown-linux-gnueabi
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
         - thing: aarch64-linux
           target: aarch64-unknown-linux-gnu
           rust: stable
           os: ubuntu-latest
           test-type: run
-        - thing: x86_64-musl
-          target: x86_64-unknown-linux-musl
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-
-        # FIXME: mingw target fails to compile due missing cross-compilers
-        # (it fails building on Windows as well, for its own reasons)
-        - thing: x86_64-mingw
-          target: x86_64-pc-windows-gnu
-          rust: stable
-          os: ubuntu-latest
-          test-type: run
-        # CI's Windows doesn't have required root certs,
-        # breaking tokio-boring and hyper-boring tests.
-        - thing: i686-msvc
-          target: i686-pc-windows-msvc
-          rust: stable-x86_64-msvc
-          os: windows-latest
-          test-type: run-without-hyper
-        - thing: x86_64-msvc
-          target: x86_64-pc-windows-msvc
-          rust: stable-x86_64-msvc
-          os: windows-latest
-          test-type: run-without-hyper
 
     steps:
     - uses: actions/checkout@v2
