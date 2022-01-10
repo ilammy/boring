@@ -68,6 +68,16 @@ jobs:
     - name: Set LIBCLANG_PATH
       if: startsWith(matrix.os, 'windows')
       run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+    - name: Setup Android cross environment
+      if: startsWith(matrix.os, 'ubuntu') && endsWith(matrix.target, 'android')
+      run: |
+        find ${ANDROID_NDK_ROOT}/toolchains
+
+        mkdir -p ~/.cargo
+        cat > ~/.cargo/config.toml <<EOF
+        [target.${{ matrix.target }}]
+        linker = "${ANDROID_NDK_ROOT}/toolchains/aarch64-linux-android-4.9/prebuild/linux-x86_64/bin/aarch64-linux-android-ld"
+        EOF
     - if: matrix.test-type == 'run-without-hyper'
       run: cargo test --target ${{ matrix.target }} --workspace --exclude tokio-boring --exclude hyper-boring
       name: Run tests (without hyper)
