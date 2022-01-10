@@ -37,6 +37,9 @@ jobs:
       run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
       shell: bash
     - run: rustup target add ${{ matrix.target }}
+    - name: Install cross-compilers
+      run: |
+        sudo apt install g++-aarch64-linux-gnu
     - name: Install nasm
       if: startsWith(matrix.os, 'windows')
       run: choco install nasm
