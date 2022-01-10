@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - master
+      - test-targets-v2
 
 env:
   RUSTFLAGS: -Dwarnings
